@@ -121,6 +121,15 @@ export MYSQL_DB="${DB_NAME}"
 export MYSQL_PORT="${DB_PORT}"
 EOF
 
+# Apply schema and seed data if present
+if [ -f "init_db.sql" ]; then
+    echo "Applying database schema and seed data..."
+    # Prefer socket for local root execution to avoid auth issues
+    sudo mysql --socket=/var/run/mysqld/mysqld.sock -u root -p${DB_PASSWORD} < init_db.sql && echo "✓ Schema and seed applied" || echo "✗ Failed to apply schema/seed"
+else
+    echo "No init_db.sql found; skipping schema and seed."
+fi
+
 echo "MySQL setup complete!"
 echo "Database: ${DB_NAME}"
 echo "Root user: root (password: ${DB_PASSWORD})"
